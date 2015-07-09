@@ -2,7 +2,6 @@ package com.example.android.spotifystreamer;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -46,9 +45,9 @@ import retrofit.client.Response;
 public class ArtistFragment extends Fragment {
 
     public ArtistArrayAdapter mSpotifyAdapter;
-    List<Artist> artists;
+    //List<Artist> artists;
     private static final String STATE_ARTIST = "state_artist";
-    String Artist_id;
+    //String Artist_id;
     ListView listview;
     public ArrayList<MyArtist> Myartists;
     public EditText search;
@@ -65,6 +64,25 @@ public class ArtistFragment extends Fragment {
 
 
     @Override
+    public void onCreate(Bundle instanceState){
+        super.onCreate(instanceState);
+        //Log.d(LOG_TAG, "In onCreate method.");
+        //this.setRetainInstance(true);
+        Myartists=instanceState.getParcelableArrayList(STATE_ARTIST);
+
+
+
+        mSpotifyAdapter=new ArtistArrayAdapter(
+                getActivity(),
+                R.layout.custome_layout,
+                //new ArrayList<MyArtist>()
+                Myartists
+
+
+        );
+    }
+
+    @Override
     public  void onStart()
     {
         // mSpotifyAdapter.onStart();
@@ -72,10 +90,26 @@ public class ArtistFragment extends Fragment {
 
 
         //FetchArtist artist=new FetchArtist();
-       // artist.fetchartist("coldplay");
+        // artist.fetchartist("coldplay");
         //PullArtistdata();
 
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelableArrayList(STATE_ARTIST, Myartists);
+    }
+
+/*
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        listview.setAdapter(mSpotifyAdapter);
+    }*/
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -83,13 +117,7 @@ public class ArtistFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-       mSpotifyAdapter=new ArtistArrayAdapter(
-                getActivity(),
-                R.layout.custome_layout,
-                new ArrayList<Artist>()
 
-
-        );
 
        // EditText search=(EditText)rowView.findViewById(R.id.search);
         search= (EditText) rootView.findViewById(R.id.search);
@@ -145,13 +173,13 @@ public class ArtistFragment extends Fragment {
 
 
 
-                Artist artist = mSpotifyAdapter.getItem(position);
+                MyArtist artist = mSpotifyAdapter.getItem(position);
                // Artist_id=artist.id;
                 //MyArtist myArtist=new MyArtist(rtist_id);
                 // Toast t = Toast.makeText(th, forecast, Toast.LENGTH_SHORT);
                 //  t.show();;
                 Intent intent = new Intent(getActivity(), TrackActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, artist.id);
+                        .putExtra(Intent.EXTRA_TEXT, artist.artist_id);
                 startActivity(intent);
 
 
@@ -175,44 +203,18 @@ public class ArtistFragment extends Fragment {
         });
 
 
-
-
-
-
-
-
         return rootView;
     }
 
-   @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-       // outState.putParcelableArrayList(STATE_ARTIST, Myartists);
-    }
-
-  /*  @Override
-    public void onCreate(Bundle instanceState){
-        super.onCreate(instanceState);
-        //Log.d(LOG_TAG, "In onCreate method.");
-        this.setRetainInstance(true);
-    }
-
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        listview.setAdapter(mSpotifyAdapter);
-    }*/
-    public class ArtistArrayAdapter extends ArrayAdapter <Artist>{
+    public class ArtistArrayAdapter extends ArrayAdapter <MyArtist>{
 
        // private final SpotifyArtist[] spotifyArtists;
       // private final Context context;
-        private List<Artist> artists;
+        private List<MyArtist> artists;
 
 
 
-        public ArtistArrayAdapter(Context context,int resource, List<Artist> artists)
+        public ArtistArrayAdapter(Context context,int resource, List<MyArtist> artists)
         {
             super(context,resource,artists);
             //this.spotifyArtists=spotifyArtists;
@@ -226,7 +228,7 @@ public class ArtistFragment extends Fragment {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            Artist artist=artists.get(position);
+            MyArtist artist=artists.get(position);
             LayoutInflater inflater = (LayoutInflater) getContext()
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View rowView = inflater.inflate(R.layout.custome_layout, null);
@@ -237,8 +239,8 @@ public class ArtistFragment extends Fragment {
             ImageView artistImage = (ImageView) rowView.findViewById(R.id.artistimage);
            // artistImage.
            // Picasso.with(context).load((Uri) artist.images).into(artistImage);
-           if( artist.images != null && !artist.images.isEmpty()) {
-               Picasso.with(getContext()).load(artist.images.get(0).url).into(artistImage);
+           if( artist.image_url != null && !artist.image_url.isEmpty()) {
+               Picasso.with(getContext()).load(artist.image_url).into(artistImage);
            }
             else
            {artistImage.setImageResource(R.mipmap.ic_launcher);}
@@ -252,7 +254,8 @@ public class ArtistFragment extends Fragment {
 
     }
 
-    public class FetchArtist{
+    public class FetchArtist {
+        //ArrayList<MyArtist> Artist;
         private final String LOG_TAG = FetchArtist.class.getSimpleName();
         public String Artist_id;
         public void fetchartist(String s){
@@ -271,7 +274,9 @@ public class ArtistFragment extends Fragment {
                     //mAdapter.addArtists(artistSearchResult);
                     if(!artistsPager.artists.items.isEmpty()) {
                         for(Artist artist : artistsPager.artists.items) {
-                            mSpotifyAdapter.add(artist);
+                           // mSpotifyAdapter.add(artist);
+
+                            Myartists.add(new MyArtist(artist.id,artist.name,artist.uri));
 
                             Log.v(LOG_TAG, "Artists entry: " + artist.name);
 
@@ -295,7 +300,7 @@ public class ArtistFragment extends Fragment {
 
     public static class MyArtist implements Parcelable{
 
-        public  final Parcelable.Creator<MyArtist> CREATOR = new Parcelable.Creator<MyArtist>()  {
+        public static final Parcelable.Creator<MyArtist> CREATOR = new Parcelable.Creator<MyArtist>()  {
 
             public MyArtist createFromParcel(Parcel in)
             {
@@ -310,24 +315,22 @@ public class ArtistFragment extends Fragment {
         };
 
         public String artist_id;
-        public List<Image> images;
+       // public List<Image> images;
         public String name;
-        public Artist artist;
+        //public Artist artist;
+        public String image_url;
 
-        public MyArtist(String artist_id,List<Image> images, String name) {
+        public MyArtist(String artist_id, String name,String image_url) {
             super();
             this.artist_id=artist_id;
-            this.images=images;
+            //this.images=images;
             this.name=name;
+            //this.artist=artist;
+            this.image_url=image_url;
 
         }
 
-        public MyArtist(Artist artist) {
-            super();
-            this.artist=artist;
 
-
-        }
 
 
         @Override
@@ -337,14 +340,20 @@ public class ArtistFragment extends Fragment {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-            //write
-            dest.writeString(this.artist_id);
+
+            dest.writeString(artist_id);
             //dest.writeList(images);
+            //dest.writeValue(artist);
+            dest.writeString(name);
+            dest.writeString(image_url);
         }
 
         protected MyArtist(Parcel in) {
             //retrieve
             artist_id = in.readString();
+            name=in.readString();
+            image_url=in.readString();
+
 
         }
 
