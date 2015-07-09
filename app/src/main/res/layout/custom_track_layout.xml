@@ -6,7 +6,7 @@
 
 
     <ImageView
-        android:id="@+id/artistimage"
+        android:id="@+id/albumimage"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
@@ -16,15 +16,25 @@
         android:src="@mipmap/ic_launcher" />
 
     <TextView
-        android:id="@+id/artistname"
+        android:id="@+id/Trackname"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
         android:layout_alignWithParentIfMissing="true"
-        android:layout_toRightOf="@id/artistimage"
         android:gravity="center_vertical"
         android:text="Example application"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/albumimage"
+        android:layout_toEndOf="@+id/albumimage" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/albumname"
+        android:layout_below="@+id/Trackname"
+        android:layout_toRightOf="@+id/albumimage"
+        android:layout_toEndOf="@+id/albumimage" />
 
 </RelativeLayout>
