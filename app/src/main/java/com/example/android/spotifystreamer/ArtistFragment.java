@@ -68,7 +68,53 @@ public class ArtistFragment extends Fragment {
         super.onCreate(instanceState);
         //Log.d(LOG_TAG, "In onCreate method.");
         //this.setRetainInstance(true);
-        Myartists=instanceState.getParcelableArrayList(STATE_ARTIST);
+        if(instanceState==null || !instanceState.containsKey(STATE_ARTIST)) {
+            search.addTextChangedListener(new TextWatcher() {
+
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    String query = s.toString();
+                    FetchArtist artist = new FetchArtist();
+                    artist.fetchartist(query);
+                    mSpotifyAdapter.clear();
+
+
+                }
+            });
+            search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+                @Override
+                public boolean onEditorAction(TextView v, int keyCode,
+                                              KeyEvent event) {
+                    if ((keyCode == KeyEvent.KEYCODE_SEARCH)) {
+                        // hide virtual keyboard
+                        InputMethodManager imm =
+                                (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(search.getWindowToken(), 0);
+                        return true;
+                    }
+                    return false;
+                }
+
+            });
+
+        }
+
+        else{
+
+        Myartists=instanceState.getParcelableArrayList(STATE_ARTIST);}
 
 
 
@@ -121,46 +167,7 @@ public class ArtistFragment extends Fragment {
 
        // EditText search=(EditText)rowView.findViewById(R.id.search);
         search= (EditText) rootView.findViewById(R.id.search);
-        search.addTextChangedListener(new TextWatcher() {
 
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String query = s.toString();
-                FetchArtist artist = new FetchArtist();
-                artist.fetchartist(query);
-                mSpotifyAdapter.clear();
-
-
-            }
-        });
-        search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
-            @Override
-            public boolean onEditorAction(TextView v, int keyCode,
-                                          KeyEvent event) {
-                if ((keyCode == KeyEvent.KEYCODE_SEARCH)) {
-                    // hide virtual keyboard
-                    InputMethodManager imm =
-                            (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(search.getWindowToken(), 0);
-                    return true;
-                }
-                return false;
-            }
-
-        });
 
 
 
