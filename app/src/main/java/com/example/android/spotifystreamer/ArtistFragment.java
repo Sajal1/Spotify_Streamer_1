@@ -76,6 +76,12 @@ public class ArtistFragment extends Fragment {
         //PullArtistdata();
 
     }
+    @Override
+    public void onCreate(Bundle instanceState){
+        super.onCreate(instanceState);
+        //Log.d(LOG_TAG, "In onCreate method.");
+        //this.setRetainInstance(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -135,18 +141,15 @@ public class ArtistFragment extends Fragment {
         });
 
 
-
-
-        listview =(ListView)rootView.findViewById(R.id.listview_spotify);
+        listview = (ListView) rootView.findViewById(R.id.listview_spotify);
         listview.setAdapter(mSpotifyAdapter);
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
 
-
                 Artist artist = mSpotifyAdapter.getItem(position);
-               // Artist_id=artist.id;
+                // Artist_id=artist.id;
                 //MyArtist myArtist=new MyArtist(rtist_id);
                 // Toast t = Toast.makeText(th, forecast, Toast.LENGTH_SHORT);
                 //  t.show();;
