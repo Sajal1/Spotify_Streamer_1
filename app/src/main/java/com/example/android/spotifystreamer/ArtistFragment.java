@@ -1,18 +1,20 @@
 package com.example.android.spotifystreamer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -21,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -43,91 +46,18 @@ import retrofit.client.Response;
  * A placeholder fragment containing a simple view.
  */
 public class ArtistFragment extends Fragment {
-
+    private static final String LOG_TAG = ArtistFragment.class.getSimpleName();
     public ArtistArrayAdapter mSpotifyAdapter;
-    //List<Artist> artists;
     private static final String STATE_ARTIST = "state_artist";
-    //String Artist_id;
     ListView listview;
-    public ArrayList<MyArtist> Myartists;
+    public ArrayList<MyArtist> Myartists=new ArrayList<MyArtist>();
+    //=new ArrayList<MyArtist>(Arrays.asList(myArtist));
     public EditText search;
-
-    //EditText search;
-
-   //public String search;
-
+    public List<MyArtist> myArtist=new ArrayList<MyArtist>();
 
 
     public ArtistFragment() {
     }
-
-
-
-    @Override
-    public void onCreate(Bundle instanceState){
-        super.onCreate(instanceState);
-        //Log.d(LOG_TAG, "In onCreate method.");
-        //this.setRetainInstance(true);
-        if(instanceState==null || !instanceState.containsKey(STATE_ARTIST)) {
-            search.addTextChangedListener(new TextWatcher() {
-
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    String query = s.toString();
-                    FetchArtist artist = new FetchArtist();
-                    artist.fetchartist(query);
-                    mSpotifyAdapter.clear();
-
-
-                }
-            });
-            search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
-                @Override
-                public boolean onEditorAction(TextView v, int keyCode,
-                                              KeyEvent event) {
-                    if ((keyCode == KeyEvent.KEYCODE_SEARCH)) {
-                        // hide virtual keyboard
-                        InputMethodManager imm =
-                                (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(search.getWindowToken(), 0);
-                        return true;
-                    }
-                    return false;
-                }
-
-            });
-
-        }
-
-        else{
-
-        Myartists=instanceState.getParcelableArrayList(STATE_ARTIST);}
-
-
-
-        mSpotifyAdapter=new ArtistArrayAdapter(
-                getActivity(),
-                R.layout.custome_layout,
-                //new ArrayList<MyArtist>()
-                Myartists
-
-
-        );
-    }
-
     @Override
     public  void onStart()
     {
@@ -140,85 +70,230 @@ public class ArtistFragment extends Fragment {
         //PullArtistdata();
 
     }
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager = (InputMethodManager)
+                activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+
+        try {
+            inputMethodManager.hideSoftInputFromWindow(
+                    activity.getCurrentFocus().getWindowToken(), 0);
+        } catch (NullPointerException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        }
+    }
+
+
+
+
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+
+        //if(Myartists!=null) {
+        ArrayList<MyArtist> Myartistss=Myartists;
+            outState.putParcelableArrayList(STATE_ARTIST, Myartistss);
+       // }
         super.onSaveInstanceState(outState);
 
-        outState.putParcelableArrayList(STATE_ARTIST, Myartists);
     }
 
-/*
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        listview.setAdapter(mSpotifyAdapter);
-    }*/
 
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+       if(savedInstanceState != null ) {
+            myArtist=savedInstanceState.getParcelableArrayList(STATE_ARTIST);
+        }
+
+            //Myartists = new ArrayList<MyArtist>(Arrays.asList())
+
+        //Myartists=new ArrayList<MyArtist>(Arrays.asList(myArtist));
+            mSpotifyAdapter = new ArtistArrayAdapter(
+                    getActivity(),
+                    R.layout.custome_layout,
+                    // new ArrayList<MyArtist>()
+                  // Myartists
+                    myArtist
+
+            );
+
+        View artistSearchView = getActivity().getLayoutInflater().inflate(
+                R.layout.search_view,null);
+       // edittext(artistSearchView);
+
+        final EditText editText = (EditText) artistSearchView.findViewById(R.id.edit_text_search_artist);
 
 
-       // EditText search=(EditText)rowView.findViewById(R.id.search);
-        search= (EditText) rootView.findViewById(R.id.search);
+            //search(rootView);
 
 
+        listview.addHeaderView(artistSearchView);
+
+            listview = (ListView) rootView.findViewById(R.id.listview_spotify);
+            listview.setAdapter(mSpotifyAdapter);
 
 
-
-        listview =(ListView)rootView.findViewById(R.id.listview_spotify);
-        listview.setAdapter(mSpotifyAdapter);
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
 
-
-                MyArtist artist = mSpotifyAdapter.getItem(position);
-               // Artist_id=artist.id;
-                //MyArtist myArtist=new MyArtist(rtist_id);
-                // Toast t = Toast.makeText(th, forecast, Toast.LENGTH_SHORT);
-                //  t.show();;
-                Intent intent = new Intent(getActivity(), TrackActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, artist.artist_id);
-                startActivity(intent);
-
-
-            }
-        });
-        listview.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView absListView, int i) {
-                InputMethodManager imm =
-                        (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(search.getWindowToken(), 0);
-
-            }
-
-            @Override
-            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+                    MyArtist artist = mSpotifyAdapter.getItem(position);
+                    // Artist_id=artist.id;
+                    //MyArtist myArtist=new MyArtist(rtist_id);
+                    // Toast t = Toast.makeText(th, forecast, Toast.LENGTH_SHORT);
+                    //  t.show();;
+                    Intent intent = new Intent(getActivity(), TrackActivity.class)
+                            .putExtra(Intent.EXTRA_TEXT, artist.artist_id);
+                    startActivity(intent);
 
 
+                }
+            });
+            listview.setOnScrollListener(new AbsListView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(AbsListView absListView, int i) {
+                    InputMethodManager imm =
+                            (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(search.getWindowToken(), 0);
 
-            }
-        });
+                }
+
+                @Override
+                public void onScroll(AbsListView absListView, int i, int i1, int i2) {
 
 
-        return rootView;
+                }
+            });
+
+
+       // listview.setAdapter(mSpotifyAdapter);
+
+
+            return rootView;
+
     }
+
+   /* public void search(View rootView)
+    {
+        search = (EditText) rootView.findViewById(R.id.search);
+
+
+        search.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String query = s.toString();
+                FetchArtist artist = new FetchArtist();
+                artist.fetchartist(query);
+
+                mSpotifyAdapter.clear();
+
+
+            }
+        });
+        search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+            @Override
+            public boolean onEditorAction(TextView v, int keyCode,
+                                          KeyEvent event) {
+                if ((keyCode == KeyEvent.KEYCODE_SEARCH)) {
+                    // hide virtual keyboard
+                    InputMethodManager imm =
+                            (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(search.getWindowToken(), 0);
+                    return true;
+                }
+                return false;
+            }
+
+        });
+
+        }*/
+    public void edittext(View artistSearchView)
+    {
+        final EditText editText = (EditText) artistSearchView
+            .findViewById(R.id.edit_text_search_artist);
+
+        editText.setOnEditorActionListener(
+                new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+                        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                            String searchQuery = editText.getText().toString();
+
+                            // Pass search query to AsyncTask
+                            try {
+                                if (isNetworkAvailable()) {
+                                    if (!searchQuery.equals("")) { // make sure text is not empty
+
+                                        editText.setText(""); // clear previous search query
+                                        // run AsyncTask
+                                        mSpotifyAdapter.clear();
+                                       FetchArtist fetchArtist= new FetchArtist();
+                                        fetchArtist.fetchartist(searchQuery);
+
+                                        hideSoftKeyboard(getActivity()); // hide keyboard
+                                        editText.clearFocus();
+                                        return true;
+                                    } else {
+                                        Toast toast = Toast.makeText(getActivity(),
+                                                "Enter an Artist name",
+                                                Toast.LENGTH_SHORT);
+                                        toast.show();
+                                        return true;
+                                    }
+                                } else {
+                                    Toast toast = Toast.makeText(getActivity(),
+                                            "Check you have a valid network connection",
+                                            Toast.LENGTH_SHORT);
+                                    toast.show();
+                                    return true;
+                                }
+
+                            } catch (IllegalStateException e) {
+                                Log.e(LOG_TAG, e.getMessage());
+                            }
+                        }
+                        return false;
+                    }
+                }
+        );
+    }
+
+
 
     public class ArtistArrayAdapter extends ArrayAdapter <MyArtist>{
 
-       // private final SpotifyArtist[] spotifyArtists;
-      // private final Context context;
-        private List<MyArtist> artists;
 
+        private List<MyArtist> artists;
 
 
         public ArtistArrayAdapter(Context context,int resource, List<MyArtist> artists)
@@ -262,7 +337,7 @@ public class ArtistFragment extends Fragment {
     }
 
     public class FetchArtist {
-        //ArrayList<MyArtist> Artist;
+
         private final String LOG_TAG = FetchArtist.class.getSimpleName();
         public String Artist_id;
         public void fetchartist(String s){
@@ -281,14 +356,19 @@ public class ArtistFragment extends Fragment {
                     //mAdapter.addArtists(artistSearchResult);
                     if(!artistsPager.artists.items.isEmpty()) {
                         for(Artist artist : artistsPager.artists.items) {
-                           // mSpotifyAdapter.add(artist);
+                          //  mSpotifyAdapter.add(new MyArtist(artist.id,artist.name,artist.uri));
 
-                            Myartists.add(new MyArtist(artist.id,artist.name,artist.uri));
+                           // myArtist.add(new MyArtist(artist.id,artist.name,artist.uri));
+                            Myartists.add(new MyArtist(artist));
+                          //Myartists=new ArrayList<MyArtist>();
+                           // myArtist=new MyArtist(artist.id,artist.name,artist.uri);
 
                             Log.v(LOG_TAG, "Artists entry: " + artist.name);
 
                         }
                     }
+                    mSpotifyAdapter.addAll(Myartists);
+                    //Myartists.clear();
                 }
 
                 @Override
@@ -336,6 +416,15 @@ public class ArtistFragment extends Fragment {
             this.image_url=image_url;
 
         }
+        public MyArtist(Artist artist) {
+            super();
+            this.artist_id = artist.id;
+            this.name=artist.name;
+            this.image_url="";
+            if (!artist.images.isEmpty()) {
+                this.image_url = artist.images.get(artist.images.size() - 2).url;
+            }
+        }
 
 
 
@@ -348,18 +437,18 @@ public class ArtistFragment extends Fragment {
         @Override
         public void writeToParcel(Parcel dest, int flags) {
 
-            dest.writeString(artist_id);
+            dest.writeString(this.artist_id);
             //dest.writeList(images);
             //dest.writeValue(artist);
-            dest.writeString(name);
-            dest.writeString(image_url);
+            dest.writeString(this.name);
+            dest.writeString(this.image_url);
         }
 
         protected MyArtist(Parcel in) {
             //retrieve
-            artist_id = in.readString();
-            name=in.readString();
-            image_url=in.readString();
+            this.artist_id = in.readString();
+            this.name=in.readString();
+            this.image_url=in.readString();
 
 
         }
