@@ -44,12 +44,27 @@ public class TrackActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_track);
+//        if (savedInstanceState == null) {
+//            getSupportFragmentManager().beginTransaction()
+//                    .add(R.id.track, new TrackFragment())
+//                    .commit();
+//        }
+
+
         if (savedInstanceState == null) {
+            // Create the detail fragment and add it to the activity
+            // using a fragment transaction.
+
+            Bundle arguments = new Bundle();
+            arguments.putString(TrackFragment.ARTIST_ID, getIntent().getStringExtra(Intent.EXTRA_TEXT));
+
+            TrackFragment fragment = new TrackFragment();
+            fragment.setArguments(arguments);
+
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.track, new TrackFragment())
+                    .add(R.id.track, fragment)
                     .commit();
         }
-
     }
 
 
@@ -79,6 +94,7 @@ public class TrackActivity extends ActionBarActivity {
 
     public static class TrackFragment extends Fragment {
         public TrackArrayAdapter mTrackArrayAdapter;
+        static final String ARTIST_ID= "artist_id";
 
         private final String LOG_TAG = TrackFragment.class.getSimpleName();
 
@@ -104,7 +120,7 @@ public class TrackActivity extends ActionBarActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            Intent intent = getActivity().getIntent();
+            //Intent intent = getActivity().getIntent();
 
 
             View rootView = inflater.inflate(R.layout.fragment_track, container, false);
@@ -124,12 +140,19 @@ public class TrackActivity extends ActionBarActivity {
             );
 
             listview = (ListView) rootView.findViewById(R.id.listview_Track);
-            if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-                String id = intent.getStringExtra(Intent.EXTRA_TEXT);
+//            if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
+//                String id = intent.getStringExtra(Intent.EXTRA_TEXT);
+//                FetchTrack fetchTrack = new FetchTrack();
+//                fetchTrack.fetchTrack(id);
+//
+//
+//            }
+            Bundle arguments=getArguments();
+            if (arguments!=null)
+            {
+                String id= arguments.getString(ARTIST_ID);
                 FetchTrack fetchTrack = new FetchTrack();
                 fetchTrack.fetchTrack(id);
-
-
             }
 
             listview.setAdapter(mTrackArrayAdapter);

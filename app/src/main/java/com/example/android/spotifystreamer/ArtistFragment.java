@@ -2,7 +2,6 @@ package com.example.android.spotifystreamer;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -50,12 +49,10 @@ public class ArtistFragment extends Fragment {
     ListView listview;
     public ArrayList<MyArtist> Myartists=new ArrayList<MyArtist>();
     public EditText search;
+    public interface Callback1 {
 
-
-//    public interface Callback1 {
-//
-//        public void onItemSelected(String artist_id);
-//    }
+        public void onItemSelected(String artist_id);
+    }
 
 
     public ArtistFragment() {
@@ -171,11 +168,11 @@ public class ArtistFragment extends Fragment {
                     //MyArtist myArtist=new MyArtist(rtist_id);
                     // Toast t = Toast.makeText(th, forecast, Toast.LENGTH_SHORT);
                     //  t.show();;
-                    Intent intent = new Intent(getActivity(), TrackActivity.class)
-                            .putExtra(Intent.EXTRA_TEXT, artist.artist_id);
-                    startActivity(intent);
+//                    Intent intent = new Intent(getActivity(), TrackActivity.class)
+//                            .putExtra(Intent.EXTRA_TEXT, artist.artist_id);
+//                    startActivity(intent);
 
-                    //((Callback1)getActivity()).onItemSelected(artist.artist_id);
+                    ((Callback1)getActivity()).onItemSelected(artist.artist_id);
 
 
 
