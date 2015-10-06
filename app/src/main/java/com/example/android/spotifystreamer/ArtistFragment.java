@@ -52,6 +52,11 @@ public class ArtistFragment extends Fragment {
     public EditText search;
 
 
+//    public interface Callback1 {
+//
+//        public void onItemSelected(String artist_id);
+//    }
+
 
     public ArtistFragment() {
     }
@@ -150,15 +155,7 @@ public class ArtistFragment extends Fragment {
 
             );
 
-       // View artistSearchView = getActivity().getLayoutInflater().inflate(
-              //  R.layout.search_view,null);
-       // edittext(artistSearchView);
 
-        //  final EditText editText = (EditText) artistSearchView.findViewById(R.id.edit_text_search_artist);
-
-        // listview.addHeaderView(artistSearchView);
-
-        //search(rootView);
 
             listview = (ListView) rootView.findViewById(R.id.listview_spotify);
             listview.setAdapter(mSpotifyAdapter);
@@ -177,6 +174,10 @@ public class ArtistFragment extends Fragment {
                     Intent intent = new Intent(getActivity(), TrackActivity.class)
                             .putExtra(Intent.EXTRA_TEXT, artist.artist_id);
                     startActivity(intent);
+
+                    //((Callback1)getActivity()).onItemSelected(artist.artist_id);
+
+
 
 
                 }
@@ -266,57 +267,7 @@ public class ArtistFragment extends Fragment {
 
 
     }
-   /* public void edittext(View artistSearchView)
-    {
-        final EditText editText = (EditText) artistSearchView
-            .findViewById(R.id.edit_text_search_artist);
 
-        editText.setOnEditorActionListener(
-                new TextView.OnEditorActionListener() {
-                    @Override
-                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-
-                        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                            String searchQuery = editText.getText().toString();
-
-                            // Pass search query to AsyncTask
-                            try {
-                                if (isNetworkAvailable()) {
-                                    if (!searchQuery.equals("")) { // make sure text is not empty
-
-                                        editText.setText(""); // clear previous search query
-                                        // run AsyncTask
-                                        mSpotifyAdapter.clear();
-                                       FetchArtist fetchArtist= new FetchArtist();
-                                        fetchArtist.fetchartist(searchQuery);
-
-                                        hideSoftKeyboard(getActivity()); // hide keyboard
-                                        editText.clearFocus();
-                                        return true;
-                                    } else {
-                                        Toast toast = Toast.makeText(getActivity(),
-                                                "Enter an Artist name",
-                                                Toast.LENGTH_SHORT);
-                                        toast.show();
-                                        return true;
-                                    }
-                                } else {
-                                    Toast toast = Toast.makeText(getActivity(),
-                                            "Check you have a valid network connection",
-                                            Toast.LENGTH_SHORT);
-                                    toast.show();
-                                    return true;
-                                }
-
-                            } catch (IllegalStateException e) {
-                                Log.e(LOG_TAG, e.getMessage());
-                            }
-                        }
-                        return false;
-                    }
-                }
-        );
-    }*/
 
 
 
@@ -478,4 +429,8 @@ public class ArtistFragment extends Fragment {
     }
 
 
+
+
 }
+
+

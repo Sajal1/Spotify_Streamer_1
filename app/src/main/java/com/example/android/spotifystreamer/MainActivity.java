@@ -2,16 +2,40 @@ package com.example.android.spotifystreamer;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.android.spotifystreamer.TrackActivity.TrackFragment;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity
+        //implements ArtistFragment.Callback1
+{
+    private static final String TRACKFRAGMENT_TAG = "TFTAG";
+
+    private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (findViewById(R.id.track) != null) {
+            // The detail container view will be present only in the large-screen layouts
+            // (res/layout-sw600dp). If this view is present, then the activity should be
+            // in two-pane mode.
+            mTwoPane = true;
+            // In two-pane mode, show the detail view in this activity by
+            // adding or replacing the detail fragment using a
+            // fragment transaction.
+            if (savedInstanceState == null) {
+                Log.v("Trackfragment", "trackfragment");
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.track, new TrackFragment(), TRACKFRAGMENT_TAG)
+                        .commit();
+            }
+        } else {
+            mTwoPane = false;
+        }
 
     }
 
@@ -39,4 +63,39 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+            ArtistFragment ff = (ArtistFragment)getSupportFragmentManager().findFragmentById(R.id.container);
+        ff.onStart();
+
+
+        }
+
+//    @Override
+//    public void onItemSelected(String artist_id)
+//    {
+//        if (mTwoPane) {
+//            // In two-pane mode, show the detail view in this activity by
+//            // adding or replacing the detail fragment using a
+//            // fragment transaction.
+//            Bundle args = new Bundle();
+//            args.putParcelable(TrackFragment.DETAIL_URI, contentUri);
+//
+//            DetailFragment fragment = new DetailFragment();
+//            fragment.setArguments(args);
+//
+//            getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG)
+//                    .commit();
+//        } else {
+//            Intent intent = new Intent(this, DetailActivity.class)
+//                    .setData(contentUri);
+//            startActivity(intent);
+//        }
+//    }
+
 }

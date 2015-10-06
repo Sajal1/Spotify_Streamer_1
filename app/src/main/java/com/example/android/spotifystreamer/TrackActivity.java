@@ -18,7 +18,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -47,7 +46,7 @@ public class TrackActivity extends ActionBarActivity {
         setContentView(R.layout.activity_track);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new TrackFragment())
+                    .add(R.id.track, new TrackFragment())
                     .commit();
         }
 
@@ -142,8 +141,20 @@ public class TrackActivity extends ActionBarActivity {
 
                     MyPlaylist playlist = mTrackArrayAdapter.getItem(position);
 
-                    Toast toast = Toast.makeText(getActivity(), playlist.trackname, Toast.LENGTH_SHORT);
-                    toast.show();
+//                    Toast toast = Toast.makeText(getActivity(), playlist.preview_url, Toast.LENGTH_SHORT);
+//                    toast.show();
+                   Intent intent = new Intent(getActivity(), Player.class);
+//                            .putExtra(Intent.EXTRA_TEXT, playlist);
+//                    startActivity(intent);
+
+//                    Bundle extras = intent.getExtras();
+//                    extras.putParcelable("TRACK", playlist);
+
+                   // Intent intent = new Intent(getActivity(), PlayerActivity.class);
+                    intent.putParcelableArrayListExtra("Track", Myplaylists);
+                    intent.putExtra("position",position);
+                   // intent.putExtra("preview",playlist.preview_url);
+                    startActivity(intent);
 
 
                 }
@@ -223,10 +234,12 @@ public class TrackActivity extends ActionBarActivity {
                             for ( Track track : tracks.tracks) {
                                 //mTrackArrayAdapter.add(track);
                                 Myplaylists.add(new MyPlaylist(track));
-                                Log.v(LOG_TAG, "Artists entry: " + track.name);
+                                Log.v(LOG_TAG, "track: " + track.name);
+                                Log.v(LOG_TAG, "track time: " + track.duration_ms);
 
                             }
                         }
+                        mTrackArrayAdapter.addAll(Myplaylists);
                     }
 
                     @Override
@@ -265,6 +278,7 @@ public class TrackActivity extends ActionBarActivity {
         public String trackname;
         public String albumname;
         public String image_url;
+        public long duration;
 
 
         public MyPlaylist(Track track) {
@@ -273,6 +287,7 @@ public class TrackActivity extends ActionBarActivity {
             this.trackname=track.name;
             this.albumname=track.album.name;
             this.image_url="";
+            this.duration=track.duration_ms;
             if (!track.album.images.isEmpty()) {
                 this.image_url = track.album.images.get(track.album.images.size() - 2).url;
             }
@@ -295,6 +310,7 @@ public class TrackActivity extends ActionBarActivity {
             dest.writeString(this.trackname);
             dest.writeString(this.albumname);
             dest.writeString(this.image_url);
+            dest.writeLong(duration);
         }
 
         protected MyPlaylist(Parcel in) {
@@ -303,6 +319,7 @@ public class TrackActivity extends ActionBarActivity {
             this.trackname=in.readString();
             this.albumname=in.readString();
             this.image_url=in.readString();
+            this.duration=in.readLong();
 
 
         }
